@@ -1,44 +1,28 @@
 #!/usr/bin/env bash
-<<<<<<< HEAD
-#to configure a new server
+# Configuring web-01 to have an HTTP respone header
 
+# updating packages
 sudo apt-get update
-sudo apt-get -y install nginx
-sudo service nginx start
-sudo sed -i "11i\\\tadd_header X-Served-By $HOSTNAME;" /etc/nginx/nginx.conf
-echo "Hello World!" | sudo tee /usr/share/nginx/html/index.html
-=======
-# configure web-02 to be identical to web-01
-# The name of the custom HTTP header must be X-Served-By
-# The value of the custom HTTP header must be the hostname of the server Nginx is running on
-#sudo sed -i 's/server_name _;.*/server_name _;\n\tadd_header X-Served-By \$hostname;/' /etc/nginx/sites-enabled/default 
-sudo apt-get -y update
-sudo apt-get -y install nginx
-sudo ufw allow 'Nginx HTTP'
-sudo mkdir -p /var/www/html /var/www/error
-sudo chmod -R 755 /var/www
-echo 'Hello World!' > /var/www/html/index.html
-echo "Ceci n'est pas une page" > /var/www/html/404.html
-server_config=\
-"server {
-	listen 80 default_server;
-	listen [::]:80 default_server;
-	root /var/www/html;
-	index index.html index.htm index.nginx-debian.html;
-	server_name _;
-	add_header X-Served-By \$hostname;
-	location / {
-		try_files \$uri \$uri/ =404;
-	}
-	if (\$request_filename ~ redirect_me){
-		rewrite ^ https://youtube.com permanent;
-	}
-	error_page 404 /404.html;
-	location = /404.html {
-		internal;
-	}
-}"
+sudo apt-get install -y nginx
 
-echo "$server_config" > /etc/nginx/sites-enabled/default
->>>>>>> 851063d559fd57c2f037c2d2818e028541bf433a
+# Creating an index page
+echo "Hello world!" | sudo tee /var/www/html/index.html
+
+# Performing a redirection
+new_string="server_name -;\n\trewrite ^\/redirect_me https:\/\/githud.com\/basthor permanent;"
+
+sudo sed -i "s/server_name -;/$new_string/" /etc/nginx/sites-enabled/default
+
+# Creating a custom error page
+
+echo "Ceci n'est pas une page" | sudo tee /var/www/html/404.html
+
+# Custom HTTP respone header
+
+sudo sed -i "server_name -;/a add_header X-Served-By $HOSTNAME;" /etc/nginx/sites-enabled/default
+
+# Test for syntax errors
+sudo nginx -t
+
+# Restart nginx
 sudo service nginx restart
